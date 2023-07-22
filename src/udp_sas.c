@@ -1,5 +1,6 @@
 
 #define _GNU_SOURCE 1	// needed for struct in6_pktinfo
+#define __APPLE_USE_RFC_3542  // needed for IPV6_RECVPKTINFO on macos
 
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -46,7 +47,11 @@ ssize_t udp_sas_recv(int sock, void* buf, size_t buf_len, int flags,
 
 				sa->sin_family = AF_INET;
 				sa->sin_port   = 0;	// not provided by the posix api
+#if __APPLE__
+				sa->sin_addr   = info->ipi_addr;
+#else
 				sa->sin_addr   = info->ipi_spec_dst;
+#endif
 			}
 			// IPv6 destination (IPV6_RECVPKTINFO)
 			else if (cmsg->cmsg_level == IPPROTO_IPV6
