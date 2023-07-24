@@ -8,7 +8,7 @@ pub struct UdpSocketSas {
 }
 
 impl UdpSocketSas {
-    pub fn bind(addr: SocketAddr) -> std::io::Result<Self> {
+    pub fn bind(addr: &SocketAddr) -> std::io::Result<Self> {
         let udp = UdpSocket::bind_sas(addr)?;
         let local_addr = udp.local_addr()?;
         udp.set_nonblocking(true)?;
@@ -40,15 +40,39 @@ impl UdpSocketSas {
         }
     }
 
+    pub async fn recv_from(&self, out: &mut [u8]) -> std::io::Result<(usize, SocketAddr)> {
+        loop {
+            let mut guard = self.inner.readable().await?;
+            match guard.try_io(|inner| inner.get_ref().recv_from(out)) {
+                Ok(result) => return result,
+                Err(_would_block) => continue,
+            }
+        }
+    }
+
     pub async fn send_sas(
         &self,
         buf: &[u8],
         source: IpAddr,
-        dest: SocketAddr,
+        dest: &SocketAddr,
     ) -> std::io::Result<usize> {
         loop {
             let mut guard = self.inner.writable().await?;
-            match guard.try_io(|inner| inner.get_ref().send_sas(buf, &dest, &source)) {
+            match guard.try_io(|inner| inner.get_ref().send_sas(buf, dest, &source)) {
+                Ok(result) => return result,
+                Err(_would_block) => continue,
+            }
+        }
+    }
+
+    pub async fn send_to(
+        &self,
+        buf: &[u8],
+        dest: &SocketAddr
+    ) -> std::io::Result<usize> {
+        loop {
+            let mut guard = self.inner.writable().await?;
+            match guard.try_io(|inner| inner.get_ref().send_to(buf, dest)) {
                 Ok(result) => return result,
                 Err(_would_block) => continue,
             }
