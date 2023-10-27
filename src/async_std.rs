@@ -1,25 +1,22 @@
+use async_io::Async;
+
 use crate::UdpSas;
 use std::net::{IpAddr, SocketAddr, UdpSocket};
-use tokio::io::unix::AsyncFd;
 
 pub struct UdpSocketSas {
     local_addr: SocketAddr,
-    inner: AsyncFd<UdpSocket>,
+    inner: Async<UdpSocket>,
 }
 
 impl UdpSocketSas {
     pub fn bind(addr: SocketAddr) -> std::io::Result<Self> {
-        let udp = UdpSocket::bind_sas(addr)?;
-        let local_addr = udp.local_addr()?;
-        udp.set_nonblocking(true)?;
+        let raw = UdpSocket::bind_sas(addr)?;
+        let local_addr = raw.local_addr()?;
+        raw.set_nonblocking(true)?;
         Ok(Self {
             local_addr,
-            inner: AsyncFd::new(udp)?,
+            inner: Async::new(raw).expect("Should be able to create async UdpSocket from raw")
         })
-    }
-
-    pub fn socket(&mut self) -> &mut UdpSocket {
-        self.inner.get_mut()
     }
 
     pub fn local_addr(&self) -> SocketAddr {
@@ -32,9 +29,9 @@ impl UdpSocketSas {
 
     pub async fn recv_sas(&self, out: &mut [u8]) -> std::io::Result<(usize, SocketAddr, IpAddr)> {
         loop {
-            let mut guard = self.inner.readable().await?;
-            match guard.try_io(|inner| inner.get_ref().recv_sas(out)) {
-                Ok(result) => return result,
+            self.inner.readable().await?;
+            match self.inner.get_ref().recv_sas(out) {
+                Ok(result) => return Ok(result),
                 Err(_would_block) => continue,
             }
         }
@@ -42,9 +39,9 @@ impl UdpSocketSas {
 
     pub async fn recv_from(&self, out: &mut [u8]) -> std::io::Result<(usize, SocketAddr)> {
         loop {
-            let mut guard = self.inner.readable().await?;
-            match guard.try_io(|inner| inner.get_ref().recv_from(out)) {
-                Ok(result) => return result,
+            self.inner.readable().await?;
+            match self.inner.get_ref().recv_from(out) {
+                Ok(result) => return Ok(result),
                 Err(_would_block) => continue,
             }
         }
@@ -57,9 +54,9 @@ impl UdpSocketSas {
         dest: SocketAddr,
     ) -> std::io::Result<usize> {
         loop {
-            let mut guard = self.inner.writable().await?;
-            match guard.try_io(|inner| inner.get_ref().send_sas(buf, &dest, &source)) {
-                Ok(result) => return result,
+            self.inner.writable().await?;
+            match self.inner.get_ref().send_sas(buf, &dest, &source) {
+                Ok(result) => return Ok(result),
                 Err(_would_block) => continue,
             }
         }
@@ -68,12 +65,12 @@ impl UdpSocketSas {
     pub async fn send_to(
         &self,
         buf: &[u8],
-        dest: SocketAddr
+        dest: &SocketAddr
     ) -> std::io::Result<usize> {
         loop {
-            let mut guard = self.inner.writable().await?;
-            match guard.try_io(|inner| inner.get_ref().send_to(buf, dest)) {
-                Ok(result) => return result,
+            self.inner.writable().await?;
+            match self.inner.get_ref().send_to(buf, dest) {
+                Ok(result) => return Ok(result),
                 Err(_would_block) => continue,
             }
         }

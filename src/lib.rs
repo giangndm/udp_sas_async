@@ -81,6 +81,9 @@ use os_socketaddr::OsSocketAddr;
 #[cfg(feature = "async_tokio")]
 pub mod tokio;
 
+#[cfg(feature = "async_std")]
+pub mod async_std;
+
 // C glue
 #[link(name = "rust_udp_sas", kind = "static")]
 extern "C" {
