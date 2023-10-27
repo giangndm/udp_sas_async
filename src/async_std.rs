@@ -15,7 +15,7 @@ impl UdpSocketSas {
         raw.set_nonblocking(true)?;
         Ok(Self {
             local_addr,
-            inner: Async::new(raw).expect("Should be able to create async UdpSocket from raw")
+            inner: Async::new(raw).expect("Should be able to create async UdpSocket from raw"),
         })
     }
 
@@ -62,11 +62,7 @@ impl UdpSocketSas {
         }
     }
 
-    pub async fn send_to(
-        &self,
-        buf: &[u8],
-        dest: &SocketAddr
-    ) -> std::io::Result<usize> {
+    pub async fn send_to(&self, buf: &[u8], dest: &SocketAddr) -> std::io::Result<usize> {
         loop {
             self.inner.writable().await?;
             match self.inner.get_ref().send_to(buf, dest) {

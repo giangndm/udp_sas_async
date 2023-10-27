@@ -65,11 +65,7 @@ impl UdpSocketSas {
         }
     }
 
-    pub async fn send_to(
-        &self,
-        buf: &[u8],
-        dest: SocketAddr
-    ) -> std::io::Result<usize> {
+    pub async fn send_to(&self, buf: &[u8], dest: SocketAddr) -> std::io::Result<usize> {
         loop {
             let mut guard = self.inner.writable().await?;
             match guard.try_io(|inner| inner.get_ref().send_to(buf, dest)) {
