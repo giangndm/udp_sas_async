@@ -19,8 +19,8 @@ cc = "1.0"
 libc  = "0.2"
 os_socketaddr = "0.2.2"
 tokio = { version = "1", features = ["net"], optional = true }
-async-std = { version = "1.12", optional = true }
-async-io = { version = "*", optional = true }
+async-std = { version = "1.12.0", optional = true }
+async-io = { version = "2.2.0", optional = true }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
