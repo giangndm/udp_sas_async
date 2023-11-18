@@ -1,0 +1,40 @@
+[package]
+name = "udp_sas_async"
+version = "0.1.0"
+authors = ["giang.ndm@gmail.com"]
+description = "Source address selection for UDP sockets"
+keywords = ["udp", "IP_PKTINFO", "IPV6_RECVPKTINFO"]
+categories = ["network-programming", "os::unix-apis"]
+license = "MIT"
+repository = "https://github.com/giangndm/udp_sas_async"
+readme = "README.md"
+
+edition = "2021"
+build = "build.rs"
+
+[build-dependencies]
+cc = "1.0"
+
+[dependencies]
+libc  = "0.2"
+os_socketaddr = "0.2.2"
+tokio = { version = "1", features = ["net"], optional = true }
+async-std = { version = "1.12", optional = true }
+async-io = { version = "*", optional = true }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+
+[features]
+async_tokio = ["tokio"]
+async_std = ["async-std", "async-io"]
+
+[[example]]
+name = "tokio_udp_server"
+path = "examples/tokio_udp_server.rs"
+required-features = ["async_tokio"]
+
+[[example]]
+name = "async_std_udp_server"
+path = "examples/async_std_udp_server.rs"
+required-features = ["async_std"]
