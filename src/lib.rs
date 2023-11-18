@@ -12,7 +12,7 @@
 //!
 //! ```
 //! use std::net::{UdpSocket,SocketAddr};
-//! use udp_sas::UdpSas;
+//! use udp_sas_async::UdpSas;
 //!
 //! fn main() {
 //!     demo().unwrap();
@@ -23,20 +23,20 @@
 //!
 //!     // Create the server socket and bind it to 0.0.0.0:30012
 //!     //
-//!     // Note: we will use 127.0.0.23 as source/destination address
+//!     // Note: we will use 127.0.0.1 as source/destination address
 //!     //       for our datagrams (to demonstrate the crate features)
 //!     //
 //!     let srv = UdpSocket::bind_sas("0.0.0.0:30012".parse::<SocketAddr>().unwrap())?;
-//!     let srv_addr = "127.0.0.23:30012".parse().unwrap();
+//!     let srv_addr = "127.0.0.1:30012".parse().unwrap();
 //!
 //!     // Create the client socket and bind it to an anonymous port
 //!     //
-//!     // Note: we will use 127.0.0.45 as source/destination address
+//!     // Note: we will use 127.0.0.1 as source/destination address
 //!     //       for our datagrams (to demonstrate the crate features)
 //!     //
 //!     let cli = UdpSocket::bind_sas("0.0.0.0:0".parse::<SocketAddr>().unwrap())?;
 //!     let cli_addr = SocketAddr::new(
-//!         "127.0.0.45".parse().unwrap(),
+//!         "127.0.0.1".parse().unwrap(),
 //!         cli.local_addr().unwrap().port());
 //!     assert_ne!(cli_addr.port(), 0);
 //!     
@@ -285,7 +285,7 @@ pub trait UdpSas: Sized {
     ///
     /// ```no_run
     /// use std::net::UdpSocket;
-    /// use udp_sas::UdpSas;
+    /// use udp_sas_async::UdpSas;
     ///
     /// let socket = UdpSocket::bind_sas("127.0.0.1:34254").expect("couldn't bind to address");
     /// ```

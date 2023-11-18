@@ -28,15 +28,11 @@ impl UdpSocketSas {
     }
 
     pub async fn recv_sas(&self, out: &mut [u8]) -> std::io::Result<(usize, SocketAddr, IpAddr)> {
-        self.inner.read_with(|io| {
-            io.recv_sas(out)
-        }).await
+        self.inner.read_with(|io| io.recv_sas(out)).await
     }
 
     pub async fn recv_from(&self, out: &mut [u8]) -> std::io::Result<(usize, SocketAddr)> {
-        self.inner.read_with(|io| {
-            io.recv_from(out)
-        }).await
+        self.inner.read_with(|io| io.recv_from(out)).await
     }
 
     pub async fn send_sas(
@@ -45,14 +41,12 @@ impl UdpSocketSas {
         source: IpAddr,
         dest: SocketAddr,
     ) -> std::io::Result<usize> {
-        self.inner.write_with(|io| {
-            io.send_sas(buf, &dest, &source)
-        }).await
+        self.inner
+            .write_with(|io| io.send_sas(buf, &dest, &source))
+            .await
     }
 
-    pub async fn send_to(&self, buf: &[u8], dest: &SocketAddr) -> std::io::Result<usize> {
-        self.inner.write_with(|io| {
-            io.send_to(buf, dest)
-        }).await
+    pub async fn send_to(&self, buf: &[u8], dest: SocketAddr) -> std::io::Result<usize> {
+        self.inner.write_with(|io| io.send_to(buf, dest)).await
     }
 }

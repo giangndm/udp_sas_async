@@ -14,3 +14,4 @@ The implementation relies on socket options
 [`IPV6_RECVPKTINFO`](http://man7.org/linux/man-pages/man7/ipv6.7.html)
 (for IPv6).
  
+This library support both async-std and tokio with features: async_tokio or async_std

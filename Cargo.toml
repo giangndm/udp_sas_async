@@ -1,23 +1,19 @@
 [package]
-name = "udp_sas"
-version = "0.1.5"
-authors = ["Anthony Baire <ayba@free.fr>"]
+name = "udp_sas_async"
+version = "0.1.0"
+authors = ["giang.ndm@gmail.com"]
 description = "Source address selection for UDP sockets"
 keywords = ["udp", "IP_PKTINFO", "IPV6_RECVPKTINFO"]
 categories = ["network-programming", "os::unix-apis"]
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/a-ba/udp_sas"
+license = "MIT"
+repository = "https://github.com/giangndm/udp_sas_async"
 readme = "README.md"
 
-edition = "2018"
+edition = "2021"
 build = "build.rs"
-
-[badges]
-travis-ci = { repository = "a-ba/udp_sas", branch = "master" }
 
 [build-dependencies]
 cc = "1.0"
-
 
 [dependencies]
 libc  = "0.2"
