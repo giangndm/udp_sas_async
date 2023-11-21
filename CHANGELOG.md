@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0](https://github.com/giangndm/udp_sas_async/compare/v0.1.0...v0.2.0) - 2023-11-21
+
+### Fixed
+- error when create with ipv6
+
+### Other
+- Merge branch 'master' of github.com:giangndm/udp_sas_async
+
 ## [0.1.0](https://github.com/giangndm/udp_sas_async/releases/tag/v0.1.0) - 2023-11-18
 
 ### Fixed
