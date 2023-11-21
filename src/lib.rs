@@ -126,24 +126,6 @@ macro_rules! try_io {
     };
 }
 
-fn getsockopt<T>(
-    socket: RawFd,
-    level: libc::c_int,
-    name: libc::c_int,
-    value: &mut T,
-) -> io::Result<libc::socklen_t> {
-    unsafe {
-        let mut len = std::mem::size_of::<T>() as libc::socklen_t;
-        try_io!(libc::getsockopt(
-            socket,
-            level,
-            name,
-            value as *mut T as *mut libc::c_void,
-            &mut len
-        ));
-        Ok(len)
-    }
-}
 fn setsockopt<T>(
     socket: RawFd,
     level: libc::c_int,
@@ -163,20 +145,11 @@ fn setsockopt<T>(
 }
 
 /// enable IP_PKTINFO/IPV6_RECVPKTINFO on a socket
-pub fn set_pktinfo(socket: RawFd) -> io::Result<()> {
-    let mut domain = libc::c_int::default();
-    #[cfg(target_os = "macos")]
-    getsockopt(socket, libc::SOL_SOCKET, libc::SO_TYPE, &mut domain)?;
-    #[cfg(not(target_os = "macos"))]
-    getsockopt(socket, libc::SOL_SOCKET, libc::SO_DOMAIN, &mut domain)?;
-
+pub fn set_pktinfo(socket: RawFd, is_v6: bool) -> io::Result<()> {
     let (level, option) = unsafe {
-        match domain {
-            libc::AF_INET => (libc::IPPROTO_IP, IP_PKTINFO),
-            libc::AF_INET6 => (libc::IPPROTO_IPV6, IPV6_RECVPKTINFO),
-            _ => {
-                return Err(io::Error::new(io::ErrorKind::Other, "not an inet socket"));
-            }
+        match is_v6 {
+            false => (libc::IPPROTO_IP, IP_PKTINFO),
+            true => (libc::IPPROTO_IPV6, IPV6_RECVPKTINFO),
         }
     };
     setsockopt(socket, level, option, &(1 as libc::c_int))
@@ -308,7 +281,7 @@ pub trait UdpSas: Sized {
 impl UdpSas for UdpSocket {
     fn bind_sas<A: ToSocketAddrs>(addr: A) -> io::Result<UdpSocket> {
         let sock = UdpSocket::bind(addr)?;
-        set_pktinfo(sock.as_raw_fd())?;
+        set_pktinfo(sock.as_raw_fd(), sock.local_addr()?.is_ipv6())?;
         Ok(sock)
     }
 
