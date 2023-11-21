@@ -7,7 +7,7 @@ This project implement async support with both tokio or async_std for udp_sas cr
 Example with tokio
 
 ```rust
-use udp_sas::tokio::UdpSocketSas;
+use udp_sas_async::tokio::UdpSocketSas;
 
 #[tokio::main]
 async fn main() {
@@ -25,7 +25,7 @@ async fn main() {
 Example with async_std
 
 ```rust
-use udp_sas::async_std::UdpSocketSas;
+use udp_sas_async::async_std::UdpSocketSas;
 
 #[tokio::main]
 async fn main() {
