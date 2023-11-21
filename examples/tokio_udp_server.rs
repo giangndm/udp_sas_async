@@ -1,4 +1,4 @@
-use udp_sas::tokio::UdpSocketSas;
+use udp_sas_async::tokio::UdpSocketSas;
 
 #[tokio::main]
 async fn main() {
